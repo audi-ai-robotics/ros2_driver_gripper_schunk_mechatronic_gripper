@@ -15,10 +15,15 @@
 # --------------------------------------------------------------------------------
 
 from launch import LaunchDescription  # type: ignore [attr-defined]
-from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument
+from launch_ros.actions import Node, PushROSNamespace
+from launch.actions import DeclareLaunchArgument, GroupAction
 from launch.substitutions import LaunchConfiguration
 
+ns = DeclareLaunchArgument(
+    "ns",
+    default_value="",
+    description="Robot namespace, e.g. robot1 (leave empty for single-robot setups).",
+)
 host = DeclareLaunchArgument(
     "host",
     default_value="",
@@ -49,28 +54,35 @@ headless = DeclareLaunchArgument(
     ),
 )
 
-args = [host, port, serial_port, device_id, headless]
+args = [ns, host, port, serial_port, device_id, headless]
 
 
 def generate_launch_description():
+    driver_node = Node(
+        package="schunk_gripper_driver",
+        namespace="schunk",
+        executable="driver.py",
+        name="driver",
+        parameters=[
+            {"host": LaunchConfiguration("host")},
+            {"port": LaunchConfiguration("port")},
+            {"serial_port": LaunchConfiguration("serial_port")},
+            {"device_id": LaunchConfiguration("device_id")},
+            {"headless": LaunchConfiguration("headless")},
+        ],
+        respawn=True,
+        output="both",
+        # arguments=['--ros-args', '--log-level', 'DEBUG'],
+    )
+
     return LaunchDescription(
         args
         + [
-            Node(
-                package="schunk_gripper_driver",
-                namespace="schunk",
-                executable="driver.py",
-                name="driver",
-                parameters=[
-                    {"host": LaunchConfiguration("host")},
-                    {"port": LaunchConfiguration("port")},
-                    {"serial_port": LaunchConfiguration("serial_port")},
-                    {"device_id": LaunchConfiguration("device_id")},
-                    {"headless": LaunchConfiguration("headless")},
-                ],
-                respawn=True,
-                output="both",
-                # arguments=['--ros-args', '--log-level', 'DEBUG'],
+            GroupAction(
+                actions=[
+                    PushROSNamespace(LaunchConfiguration("ns")),
+                    driver_node,
+                ]
             )
         ]
     )
