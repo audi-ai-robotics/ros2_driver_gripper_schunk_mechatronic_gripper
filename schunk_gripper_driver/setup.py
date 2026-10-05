@@ -22,7 +22,7 @@ setup(
     maintainer_email="jonas.beil@de.schunk.com",
     description="ROS2 driver for SCHUNK`s EGU, EGK, and EZU mechatronic grippers",
     license="GPL-3.0-or-later",
-    tests_require=["pytest"],
+    extras_require={"test": ["pytest"]},
     entry_points={
         "console_scripts": [],
     },

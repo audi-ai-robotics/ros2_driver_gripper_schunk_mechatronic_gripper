@@ -33,7 +33,7 @@ setup(
     maintainer_email="jonas.beil@de.schunk.com",
     description="Low-level driver library for Modbus RTU and Ethernet SCHUNK grippers",
     license="GPL-3.0-or-later",
-    tests_require=["pytest", "coverage"],
+    extras_require={"test": ["pytest", "coverage"]},
     entry_points={
         "console_scripts": [],
     },

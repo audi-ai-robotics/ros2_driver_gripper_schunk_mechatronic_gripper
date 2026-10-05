@@ -36,7 +36,7 @@ setup(
     maintainer_email="jonas.beil@de.schunk.com",
     description="A minimalist dummy for simulating the gripper's communication",
     license="GPL-3.0-or-later",
-    tests_require=["pytest", "coverage"],
+    extras_require={"test": ["pytest", "coverage"]},
     entry_points={
         "console_scripts": [
             "start_dummy = schunk_gripper_dummy.main:main",
